@@ -1,7 +1,8 @@
 import sqlite3
+from datetime import date
 from pathlib import Path
 
-from task_manager.models import Task
+from task_manager.models import Priority, Task
 
 DB_PATH = Path("tasks.db")
 
@@ -17,10 +18,10 @@ def initialize_database() -> None:
         """
             CREATE TABLE IF NOT EXISTS tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title NOT NULL,
+            title TEXT NOT NULL,
             priority TEXT NOT NULL,
             due_date TEXT NOT NULL,
-            done TEXT NOT NULL
+            done INTEGER NOT NULL
             )
 
         """
@@ -47,3 +48,33 @@ def add_task(task: Task) -> Task:
     return Task(
         title=task.title, priority=task.priority, due_date=task.due_date, done=task.done, id=new_id
     )
+
+
+def get_all_tasks() -> list[Task]:
+    connection = get_connection()
+    cursor = connection.cursor()
+    cursor.execute("SELECT id,title,priority,due_date,done from tasks")
+    rows = cursor.fetchall()
+    connection.close()
+
+    tasks = []
+    for row in rows:
+        task = Task(
+            id=row[0],
+            title=row[1],
+            priority=Priority(row[2]),
+            due_date=date.fromisoformat(row[3]),
+            done=bool(row[4]),
+        )
+        tasks.append(task)
+    return tasks
+
+
+def delete_task(task_id: int) -> bool:
+    connection = get_connection()
+    cursor = connection.cursor()
+    cursor.execute("DELETE from tasks where id = ?", (task_id,))
+    connection.commit()
+    row_deleted = cursor.rowcount
+    connection.close()
+    return row_deleted > 0
