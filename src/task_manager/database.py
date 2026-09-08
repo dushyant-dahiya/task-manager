@@ -78,3 +78,20 @@ def delete_task(task_id: int) -> bool:
     row_deleted = cursor.rowcount
     connection.close()
     return row_deleted > 0
+
+
+def complete_task(task_id: int) -> bool:
+    connection = get_connection()
+    cursor = connection.cursor()
+    cursor.execute(
+        """
+        UPDATE tasks 
+        SET done = ?
+        WHERE id = ?
+        """,
+        (True, task_id),
+    )
+    connection.commit()
+    updated_row = cursor.rowcount
+    connection.close()
+    return updated_row > 0
