@@ -29,3 +29,26 @@ def test_complete_task_returns_false_when_id_does_not_exist(test_db: None) -> No
     result = database.complete_task(999)
 
     assert result is False
+
+
+def test_edit_task_update_fields(test_db: None) -> None:
+    task = Task(title="do homework", priority=Priority.HIGH, due_date=date(2026, 9, 20), done=False)
+    saved_task = database.add_task(task)
+    assert saved_task.id is not None
+
+    result = database.edit_task(
+        saved_task.id, "do homework and reading", Priority.LOW, date(2026, 10, 1)
+    )
+
+    assert result is True
+
+    all_tasks = database.get_all_tasks()
+    assert all_tasks[0].title == "do homework and reading"
+    assert all_tasks[0].priority == Priority.LOW
+    assert all_tasks[0].due_date == date(2026, 10, 1)
+
+
+def test_edit_task_returns_false_when_id_does_not_exist(test_db: None) -> None:
+    result = database.edit_task(999, "some title", Priority.LOW, date(2026, 10, 1))
+
+    assert result is False

@@ -18,6 +18,12 @@ def main() -> None:
     complete_parser = subparsers.add_parser("complete", help="Mark a task complete")
     complete_parser.add_argument("--id", type=int, required=True)
 
+    edit_parser = subparsers.add_parser("edit", help="Edit a task")
+    edit_parser.add_argument("--id", type=int, required=True)
+    edit_parser.add_argument("--title", type=str)
+    edit_parser.add_argument("--priority", type=str)
+    edit_parser.add_argument("--due_date", type=str)
+
     args = parser.parse_args()
 
     if args.command == "add":
@@ -53,3 +59,18 @@ def main() -> None:
             print(f"Updated task with id {args.id}")
         else:
             print(f"No task found with id {args.id}")
+
+    elif args.command == "edit":
+        try:
+            updated = operations.edit_task_with_validation(
+                args.id,
+                args.title,
+                Priority(args.priority),
+                date.fromisoformat(args.due_date),
+            )
+            if updated:
+                print(f"Updated task with id {args.id}")
+            else:
+                print(f"No task found with id {args.id}")
+        except ValueError as e:
+            print(f"Error: {e}")

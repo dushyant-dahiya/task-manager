@@ -95,3 +95,16 @@ def complete_task(task_id: int) -> bool:
     updated_row = cursor.rowcount
     connection.close()
     return updated_row > 0
+
+
+def edit_task(task_id: int, title: str, priority: Priority, due_date: date) -> bool:
+    connection = get_connection()
+    cursor = connection.cursor()
+    cursor.execute(
+        "UPDATE tasks SET title = ?, priority = ?, due_date = ? WHERE id = ?",
+        (title, priority.value, due_date.isoformat(), task_id),
+    )
+    connection.commit()
+    rows_updated = cursor.rowcount
+    connection.close()
+    return rows_updated > 0
