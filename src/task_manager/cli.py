@@ -1,7 +1,7 @@
 import argparse
 from datetime import date
 
-from task_manager import database, operations
+from task_manager import ai, database, operations
 from task_manager.models import Priority, Task
 
 
@@ -23,6 +23,9 @@ def main() -> None:
     edit_parser.add_argument("--title", type=str)
     edit_parser.add_argument("--priority", type=str)
     edit_parser.add_argument("--due_date", type=str)
+
+    add_n1_parser = subparsers.add_parser("add-nl", help="Add a task using natural language")
+    add_n1_parser.add_argument("text", type=str)
 
     args = parser.parse_args()
 
@@ -72,5 +75,23 @@ def main() -> None:
                 print(f"Updated task with id {args.id}")
             else:
                 print(f"No task found with id {args.id}")
+        except ValueError as e:
+            print(f"Error: {e}")
+
+    elif args.command == "add-nl":
+        try:
+            parsed = ai.parse_task_text(args.text)
+            task = Task(
+                title=parsed.title,
+                priority=Priority(parsed.priority),
+                due_date=parsed.due_date,
+                done=False,
+            )
+            saved_task = operations.add_task_with_validation(task)
+            print(
+                f"Added Task: Id: {saved_task.id} Title: {saved_task.title} "
+                f"Priority: {saved_task.priority} Due Date: {saved_task.due_date} "
+                f"Status : {saved_task.done}"
+            )
         except ValueError as e:
             print(f"Error: {e}")

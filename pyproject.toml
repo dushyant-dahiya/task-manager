@@ -7,7 +7,12 @@ authors = [
     { name = "Dushyant Dahiya", email = "dushyant.dahiya88@gmail.com" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "anthropic>=1.5.0",
+    "pydantic>=2.13.5",
+    "pydantic-settings>=2.15.0",
+    "python-dotenv>=1.2.3",
+]
 
 [project.scripts]
 task-manager = "task_manager.cli:main"
